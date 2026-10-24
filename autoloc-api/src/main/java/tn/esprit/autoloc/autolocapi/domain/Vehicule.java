@@ -1,5 +1,6 @@
 package tn.esprit.autoloc.autolocapi.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,9 +35,11 @@ public class Vehicule {
     private StatutVehicule statut;
     @ManyToOne
     private Agence agence;
-    @OneToMany(mappedBy = "vehicule")
-    private List<Reservation> reservations;
+
     @ManyToMany
     private List<Equipement> equipements;
+    @JsonIgnore
+    @OneToMany(mappedBy = "vehicule")
+    private List<Reservation> reservations;
 
 }

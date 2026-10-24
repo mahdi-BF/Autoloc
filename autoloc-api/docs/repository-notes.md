@@ -77,6 +77,12 @@ observées dans le panneau Findings, puis corrigées.
 
 | Anomalie | Règle / explication | Correction apportée |
 |---|---|---|
+## D. Anomalies SonarQube for IDE
+
+| Anomalie | Règle / explication | Correction apportée |
+|---|---|---|
+| Conteneur `@ApiResponses({...})` dans les contrôleurs (ex. `ContratController`, lignes 39, 50, 61, 74) | `java:S1710` : depuis Java 8, une annotation peut être répétée directement, le conteneur est redondant. | Conteneur supprimé : les annotations `@ApiResponse` sont écrites à la suite, et l'import `ApiResponses` est retiré. |
+| Entité JPA reçue directement par `@RequestBody` dans `create` et `update` (ex. `ContratController`, lignes 56 et 69) | `java:S4684` : exposer une entité persistante permet à un client de modifier des champs internes (mass assignment) et couple l'API au modèle de base de données. | Non corrigée volontairement : l'énoncé impose l'exposition directe des entités à ce stade. La correction (DTO et validation) est prévue au Chapitre 10. |
 | Injection par attribut (`@Autowired` sur le champ) dans `ClientServiceImpl` | S6813 : le champ ne peut pas être `final`, la dépendance est cachée et reste `null` si la classe est créée hors du conteneur. | Remplacée par l'injection par constructeur (`@RequiredArgsConstructor` + champ `final`). |
 | `RuntimeException` levée dans `ContratServiceImpl.findById` | S112 : une exception générique ne permet pas de distinguer l'erreur et d'y répondre précisément. | Remplacée par l'exception métier `ResourceNotFoundException`. |
 | `System.out.println` dans `AgenceServiceImpl.findAll` | S106 : la sortie standard doit être remplacée par un logger. | Ligne supprimée. |

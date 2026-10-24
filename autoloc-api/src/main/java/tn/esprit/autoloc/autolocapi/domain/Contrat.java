@@ -1,9 +1,12 @@
 package tn.esprit.autoloc.autolocapi.domain;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -25,6 +28,9 @@ public class Contrat {
     private boolean valide;
     @OneToOne
     private  Reservation reservation;
-    @OneToMany(mappedBy = "contrat")
-    private List<Paiement> paiements;
+//    @OneToMany(mappedBy = "contrat")
+//    private List<Paiement> paiements;
+    @OneToMany(mappedBy = "contrat", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("contrat-paiements")
+     private List<Paiement> paiements;
 }
