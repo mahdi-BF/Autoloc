@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Employe;
+import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.web.dto.EmployeDto;
 import tn.esprit.autoloc.autolocapi.service.IEmployeService;
 
 @Tag(name = "Employés", description = "Gestion des employés des agences")
@@ -27,12 +29,13 @@ import tn.esprit.autoloc.autolocapi.service.IEmployeService;
 public class EmployeController {
 
     private final IEmployeService employeService;
+    private final ApiMapper apiMapper;
 
     @Operation(summary = "Lister les employés")
     @ApiResponse(responseCode = "200", description = "Liste des employés")
     @GetMapping
-    public List<Employe> findAll() {
-        return employeService.findAll();
+    public List<EmployeDto> findAll() {
+        return employeService.findAll().stream().map(apiMapper::toDto).toList();
     }
 
     @Operation(summary = "Consulter un employé")
@@ -41,9 +44,9 @@ public class EmployeController {
             @ApiResponse(responseCode = "404", description = "Employé introuvable")
     })
     @GetMapping("/{id}")
-    public Employe findById(
+    public EmployeDto findById(
             @Parameter(description = "Identifiant de l'employé") @PathVariable Long id) {
-        return employeService.findById(id);
+        return apiMapper.toDto(employeService.findById(id));
     }
 
     @Operation(summary = "Créer un employé")
@@ -53,8 +56,8 @@ public class EmployeController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Employe create(@RequestBody Employe employe) {
-        return employeService.create(employe);
+    public EmployeDto create(@jakarta.validation.Valid @RequestBody EmployeDto dto) {
+        return apiMapper.toDto(employeService.create(apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Modifier un employé")
@@ -64,10 +67,10 @@ public class EmployeController {
             @ApiResponse(responseCode = "400", description = "Données invalides")
     })
     @PutMapping("/{id}")
-    public Employe update(
+    public EmployeDto update(
             @Parameter(description = "Identifiant de l'employé") @PathVariable Long id,
-            @RequestBody Employe employe) {
-        return employeService.update(id, employe);
+            @jakarta.validation.Valid @RequestBody EmployeDto dto) {
+        return apiMapper.toDto(employeService.update(id, apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Supprimer un employé")

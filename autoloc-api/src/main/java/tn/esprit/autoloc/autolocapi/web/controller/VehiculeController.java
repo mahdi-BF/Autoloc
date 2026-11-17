@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Vehicule;
+import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.web.dto.VehiculeDto;
 import tn.esprit.autoloc.autolocapi.service.IVehiculeService;
 
 @Tag(name = "Véhicules", description = "Gestion des véhicules de la flotte")
@@ -27,12 +29,13 @@ import tn.esprit.autoloc.autolocapi.service.IVehiculeService;
 public class VehiculeController {
 
     private final IVehiculeService vehiculeService;
+    private final ApiMapper apiMapper;
 
     @Operation(summary = "Lister les véhicules")
     @ApiResponse(responseCode = "200", description = "Liste des véhicules")
     @GetMapping
-    public List<Vehicule> findAll() {
-        return vehiculeService.findAll();
+    public List<VehiculeDto> findAll() {
+        return vehiculeService.findAll().stream().map(apiMapper::toDto).toList();
     }
 
     @Operation(summary = "Consulter un véhicule")
@@ -41,9 +44,9 @@ public class VehiculeController {
             @ApiResponse(responseCode = "404", description = "Véhicule introuvable")
     })
     @GetMapping("/{id}")
-    public Vehicule findById(
+    public VehiculeDto findById(
             @Parameter(description = "Identifiant du véhicule") @PathVariable Long id) {
-        return vehiculeService.findById(id);
+        return apiMapper.toDto(vehiculeService.findById(id));
     }
 
     @Operation(summary = "Créer un véhicule")
@@ -53,8 +56,8 @@ public class VehiculeController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Vehicule create(@RequestBody Vehicule vehicule) {
-        return vehiculeService.create(vehicule);
+    public VehiculeDto create(@jakarta.validation.Valid @RequestBody VehiculeDto dto) {
+        return apiMapper.toDto(vehiculeService.create(apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Modifier un véhicule")
@@ -64,10 +67,10 @@ public class VehiculeController {
             @ApiResponse(responseCode = "400", description = "Données invalides")
     })
     @PutMapping("/{id}")
-    public Vehicule update(
+    public VehiculeDto update(
             @Parameter(description = "Identifiant du véhicule") @PathVariable Long id,
-            @RequestBody Vehicule vehicule) {
-        return vehiculeService.update(id, vehicule);
+            @jakarta.validation.Valid @RequestBody VehiculeDto dto) {
+        return apiMapper.toDto(vehiculeService.update(id, apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Supprimer un véhicule")

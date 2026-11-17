@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Agence;
+import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.web.dto.AgenceDto;
 import tn.esprit.autoloc.autolocapi.service.IAgenceService;
 
 @Tag(name = "Agences", description = "Gestion des agences de location")
@@ -27,13 +29,14 @@ import tn.esprit.autoloc.autolocapi.service.IAgenceService;
 public class AgenceController {
 
     private final IAgenceService agenceService;
+    private final ApiMapper apiMapper;
 
     @Operation(summary = "Lister les agences")
     @ApiResponse(responseCode = "200", description = "Liste des agences")
 
     @GetMapping
-    public List<Agence> findAll() {
-        return agenceService.findAll();
+    public List<AgenceDto> findAll() {
+        return agenceService.findAll().stream().map(apiMapper::toDto).toList();
     }
 
     @Operation(summary = "Consulter une agence")
@@ -42,9 +45,9 @@ public class AgenceController {
             @ApiResponse(responseCode = "404", description = "Agence introuvable")
     })
     @GetMapping("/{id}")
-    public Agence findById(
+    public AgenceDto findById(
             @Parameter(description = "Identifiant de l'agence") @PathVariable Long id) {
-        return agenceService.findById(id);
+        return apiMapper.toDto(agenceService.findById(id));
     }
 
     @Operation(summary = "Créer une agence")
@@ -54,8 +57,8 @@ public class AgenceController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Agence create(@RequestBody Agence agence) {
-        return agenceService.create(agence);
+    public AgenceDto create(@jakarta.validation.Valid @RequestBody AgenceDto dto) {
+        return apiMapper.toDto(agenceService.create(apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Modifier une agence")
@@ -66,10 +69,10 @@ public class AgenceController {
 
     })
     @PutMapping("/{id}")
-    public Agence update(
+    public AgenceDto update(
             @Parameter(description = "Identifiant de l'agence") @PathVariable Long id,
-            @RequestBody Agence agence) {
-        return agenceService.update(id, agence);
+            @jakarta.validation.Valid @RequestBody AgenceDto dto) {
+        return apiMapper.toDto(agenceService.update(id, apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Supprimer une agence")

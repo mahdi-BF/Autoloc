@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Client;
+import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.web.dto.ClientDto;
 import tn.esprit.autoloc.autolocapi.service.IClientService;
 
 @Tag(name = "Clients", description = "Gestion des clients")
@@ -27,13 +29,14 @@ import tn.esprit.autoloc.autolocapi.service.IClientService;
 public class ClientController {
 
     private final IClientService clientService;
+    private final ApiMapper apiMapper;
 
     @Operation(summary = "Lister les clients")
     @ApiResponse(responseCode = "200", description = "Liste des clients")
 
     @GetMapping
-    public List<Client> findAll() {
-        return clientService.findAll();
+    public List<ClientDto> findAll() {
+        return clientService.findAll().stream().map(apiMapper::toDto).toList();
     }
 
     @Operation(summary = "Consulter un client")
@@ -42,9 +45,9 @@ public class ClientController {
             @ApiResponse(responseCode = "404", description = "Client introuvable")
     })
     @GetMapping("/{id}")
-    public Client findById(
+    public ClientDto findById(
             @Parameter(description = "Identifiant du client") @PathVariable Long id) {
-        return clientService.findById(id);
+        return apiMapper.toDto(clientService.findById(id));
     }
 
     @Operation(summary = "Créer un client")
@@ -54,8 +57,8 @@ public class ClientController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Client create(@RequestBody Client client) {
-        return clientService.create(client);
+    public ClientDto create(@jakarta.validation.Valid @RequestBody ClientDto dto) {
+        return apiMapper.toDto(clientService.create(apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Modifier un client")
@@ -66,10 +69,10 @@ public class ClientController {
 
     })
     @PutMapping("/{id}")
-    public Client update(
+    public ClientDto update(
             @Parameter(description = "Identifiant du client") @PathVariable Long id,
-            @RequestBody Client client) {
-        return clientService.update(id, client);
+            @jakarta.validation.Valid @RequestBody ClientDto dto) {
+        return apiMapper.toDto(clientService.update(id, apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Supprimer un client")

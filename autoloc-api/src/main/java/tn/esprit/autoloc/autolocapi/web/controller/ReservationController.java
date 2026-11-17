@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Reservation;
+import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.web.dto.ReservationDto;
 import tn.esprit.autoloc.autolocapi.service.IReservationService;
 
 @Tag(name = "Réservations", description = "Gestion des réservations de véhicules")
@@ -27,13 +29,14 @@ import tn.esprit.autoloc.autolocapi.service.IReservationService;
 public class ReservationController {
 
     private final IReservationService reservationService;
+    private final ApiMapper apiMapper;
 
     @Operation(summary = "Lister les réservations")
     @ApiResponse(responseCode = "200", description = "Liste des réservations")
 
     @GetMapping
-    public List<Reservation> findAll() {
-        return reservationService.findAll();
+    public List<ReservationDto> findAll() {
+        return reservationService.findAll().stream().map(apiMapper::toDto).toList();
     }
 
     @Operation(summary = "Consulter une réservation")
@@ -42,9 +45,9 @@ public class ReservationController {
             @ApiResponse(responseCode = "404", description = "Réservation introuvable")
     })
     @GetMapping("/{id}")
-    public Reservation findById(
+    public ReservationDto findById(
             @Parameter(description = "Identifiant de la réservation") @PathVariable Long id) {
-        return reservationService.findById(id);
+        return apiMapper.toDto(reservationService.findById(id));
     }
 
     @Operation(summary = "Créer une réservation")
@@ -54,8 +57,8 @@ public class ReservationController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Reservation create(@RequestBody Reservation reservation) {
-        return reservationService.create(reservation);
+    public ReservationDto create(@jakarta.validation.Valid @RequestBody ReservationDto dto) {
+        return apiMapper.toDto(reservationService.create(apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Modifier une réservation")
@@ -66,10 +69,10 @@ public class ReservationController {
 
     })
     @PutMapping("/{id}")
-    public Reservation update(
+    public ReservationDto update(
             @Parameter(description = "Identifiant de la réservation") @PathVariable Long id,
-            @RequestBody Reservation reservation) {
-        return reservationService.update(id, reservation);
+            @jakarta.validation.Valid @RequestBody ReservationDto dto) {
+        return apiMapper.toDto(reservationService.update(id, apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Supprimer une réservation")

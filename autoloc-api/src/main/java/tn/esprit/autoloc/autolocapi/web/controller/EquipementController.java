@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Equipement;
+import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.web.dto.EquipementDto;
 import tn.esprit.autoloc.autolocapi.service.IEquipementService;
 
 @Tag(name = "Équipements", description = "Gestion des équipements des véhicules")
@@ -27,12 +29,13 @@ import tn.esprit.autoloc.autolocapi.service.IEquipementService;
 public class EquipementController {
 
     private final IEquipementService equipementService;
+    private final ApiMapper apiMapper;
 
     @Operation(summary = "Lister les équipements")
     @ApiResponse(responseCode = "200", description = "Liste des équipements")
     @GetMapping
-    public List<Equipement> findAll() {
-        return equipementService.findAll();
+    public List<EquipementDto> findAll() {
+        return equipementService.findAll().stream().map(apiMapper::toDto).toList();
     }
 
     @Operation(summary = "Consulter un équipement")
@@ -41,9 +44,9 @@ public class EquipementController {
             @ApiResponse(responseCode = "404", description = "Équipement introuvable")
     })
     @GetMapping("/{id}")
-    public Equipement findById(
+    public EquipementDto findById(
             @Parameter(description = "Identifiant de l'équipement") @PathVariable Long id) {
-        return equipementService.findById(id);
+        return apiMapper.toDto(equipementService.findById(id));
     }
 
     @Operation(summary = "Créer un équipement")
@@ -53,8 +56,8 @@ public class EquipementController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Equipement create(@RequestBody Equipement equipement) {
-        return equipementService.create(equipement);
+    public EquipementDto create(@jakarta.validation.Valid @RequestBody EquipementDto dto) {
+        return apiMapper.toDto(equipementService.create(apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Modifier un équipement")
@@ -64,10 +67,10 @@ public class EquipementController {
             @ApiResponse(responseCode = "400", description = "Données invalides")
     })
     @PutMapping("/{id}")
-    public Equipement update(
+    public EquipementDto update(
             @Parameter(description = "Identifiant de l'équipement") @PathVariable Long id,
-            @RequestBody Equipement equipement) {
-        return equipementService.update(id, equipement);
+            @jakarta.validation.Valid @RequestBody EquipementDto dto) {
+        return apiMapper.toDto(equipementService.update(id, apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Supprimer un équipement")

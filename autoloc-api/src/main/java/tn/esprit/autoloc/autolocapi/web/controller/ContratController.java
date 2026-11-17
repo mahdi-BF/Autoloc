@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import tn.esprit.autoloc.autolocapi.domain.Contrat;
 import tn.esprit.autoloc.autolocapi.service.IContratService;
+import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.web.dto.ContratDto;
+
+import jakarta.validation.Valid;
 
 @Tag(name = "Contrats", description = "Gestion des contrats de location")
 @RestController
@@ -27,12 +30,13 @@ import tn.esprit.autoloc.autolocapi.service.IContratService;
 public class ContratController {
 
     private final IContratService contratService;
+    private final ApiMapper apiMapper;
 
     @Operation(summary = "Lister les contrats")
     @ApiResponse(responseCode = "200", description = "Liste des contrats")
     @GetMapping
-    public List<Contrat> findAll() {
-        return contratService.findAll();
+    public List<ContratDto> findAll() {
+        return contratService.findAll().stream().map(apiMapper::toDto).toList();
     }
 
     @Operation(summary = "Consulter un contrat")
@@ -40,9 +44,9 @@ public class ContratController {
     @ApiResponse(responseCode = "404", description = "Contrat introuvable")
 
     @GetMapping("/{id}")
-    public Contrat findById(
+    public ContratDto findById(
             @Parameter(description = "Identifiant du contrat") @PathVariable Long id) {
-        return contratService.findById(id);
+        return apiMapper.toDto(contratService.findById(id));
     }
 
     @Operation(summary = "Créer un contrat (avec ses paiements)")
@@ -52,8 +56,8 @@ public class ContratController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Contrat create(@RequestBody Contrat contrat) {
-        return contratService.create(contrat);
+    public ContratDto create(@Valid @RequestBody ContratDto dto) {
+        return apiMapper.toDto(contratService.create(apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Modifier un contrat")
@@ -63,10 +67,10 @@ public class ContratController {
             @ApiResponse(responseCode = "400", description = "Données invalides")
 
     @PutMapping("/{id}")
-    public Contrat update(
+    public ContratDto update(
             @Parameter(description = "Identifiant du contrat") @PathVariable Long id,
-            @RequestBody Contrat contrat) {
-        return contratService.update(id, contrat);
+            @Valid @RequestBody ContratDto dto) {
+        return apiMapper.toDto(contratService.update(id, apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Supprimer un contrat (et ses paiements)")
@@ -81,3 +85,4 @@ public class ContratController {
         contratService.deleteById(id);
     }
 }
+

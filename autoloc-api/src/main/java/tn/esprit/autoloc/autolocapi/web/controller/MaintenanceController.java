@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Maintenance;
+import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.web.dto.MaintenanceDto;
 import tn.esprit.autoloc.autolocapi.service.IMaintenanceService;
 
 @Tag(name = "Maintenances", description = "Gestion des maintenances des véhicules")
@@ -27,13 +29,14 @@ import tn.esprit.autoloc.autolocapi.service.IMaintenanceService;
 public class MaintenanceController {
 
     private final IMaintenanceService maintenanceService;
+    private final ApiMapper apiMapper;
 
     @Operation(summary = "Lister les maintenances")
     @ApiResponse(responseCode = "200", description = "Liste des maintenances")
 
     @GetMapping
-    public List<Maintenance> findAll() {
-        return maintenanceService.findAll();
+    public List<MaintenanceDto> findAll() {
+        return maintenanceService.findAll().stream().map(apiMapper::toDto).toList();
     }
 
     @Operation(summary = "Consulter une maintenance")
@@ -42,9 +45,9 @@ public class MaintenanceController {
             @ApiResponse(responseCode = "404", description = "Maintenance introuvable")
     })
     @GetMapping("/{id}")
-    public Maintenance findById(
+    public MaintenanceDto findById(
             @Parameter(description = "Identifiant de la maintenance") @PathVariable Long id) {
-        return maintenanceService.findById(id);
+        return apiMapper.toDto(maintenanceService.findById(id));
     }
 
     @Operation(summary = "Créer une maintenance")
@@ -54,8 +57,8 @@ public class MaintenanceController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Maintenance create(@RequestBody Maintenance maintenance) {
-        return maintenanceService.create(maintenance);
+    public MaintenanceDto create(@jakarta.validation.Valid @RequestBody MaintenanceDto dto) {
+        return apiMapper.toDto(maintenanceService.create(apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Modifier une maintenance")
@@ -66,10 +69,10 @@ public class MaintenanceController {
 
     })
     @PutMapping("/{id}")
-    public Maintenance update(
+    public MaintenanceDto update(
             @Parameter(description = "Identifiant de la maintenance") @PathVariable Long id,
-            @RequestBody Maintenance maintenance) {
-        return maintenanceService.update(id, maintenance);
+            @jakarta.validation.Valid @RequestBody MaintenanceDto dto) {
+        return apiMapper.toDto(maintenanceService.update(id, apiMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Supprimer une maintenance")
