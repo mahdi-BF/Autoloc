@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Maintenance;
-import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.mapper.MaintenanceMapper;
 import tn.esprit.autoloc.autolocapi.web.dto.MaintenanceDto;
 import tn.esprit.autoloc.autolocapi.service.IMaintenanceService;
 
@@ -29,7 +29,7 @@ import tn.esprit.autoloc.autolocapi.service.IMaintenanceService;
 public class MaintenanceController {
 
     private final IMaintenanceService maintenanceService;
-    private final ApiMapper apiMapper;
+    private final MaintenanceMapper apiMapper;
 
     @Operation(summary = "Lister les maintenances")
     @ApiResponse(responseCode = "200", description = "Liste des maintenances")

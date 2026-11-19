@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Client;
-import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.mapper.ClientMapper;
 import tn.esprit.autoloc.autolocapi.web.dto.ClientDto;
 import tn.esprit.autoloc.autolocapi.service.IClientService;
 
@@ -29,7 +29,7 @@ import tn.esprit.autoloc.autolocapi.service.IClientService;
 public class ClientController {
 
     private final IClientService clientService;
-    private final ApiMapper apiMapper;
+    private final ClientMapper apiMapper;
 
     @Operation(summary = "Lister les clients")
     @ApiResponse(responseCode = "200", description = "Liste des clients")

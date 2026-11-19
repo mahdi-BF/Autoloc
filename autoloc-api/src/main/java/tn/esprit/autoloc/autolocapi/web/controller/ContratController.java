@@ -3,7 +3,6 @@ package tn.esprit.autoloc.autolocapi.web.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.service.IContratService;
-import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
-import tn.esprit.autoloc.autolocapi.web.dto.ContratDto;
+import tn.esprit.autoloc.autolocapi.mapper.ContratMapper;
 
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import tn.esprit.autoloc.autolocapi.web.dto.ContratDTO;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Contrats", description = "Gestion des contrats de location")
 @RestController
@@ -30,12 +32,12 @@ import jakarta.validation.Valid;
 public class ContratController {
 
     private final IContratService contratService;
-    private final ApiMapper apiMapper;
+    private final ContratMapper apiMapper;
 
     @Operation(summary = "Lister les contrats")
     @ApiResponse(responseCode = "200", description = "Liste des contrats")
     @GetMapping
-    public List<ContratDto> findAll() {
+    public List<ContratDTO> findAll() {
         return contratService.findAll().stream().map(apiMapper::toDto).toList();
     }
 
@@ -44,7 +46,7 @@ public class ContratController {
     @ApiResponse(responseCode = "404", description = "Contrat introuvable")
 
     @GetMapping("/{id}")
-    public ContratDto findById(
+    public ContratDTO findById(
             @Parameter(description = "Identifiant du contrat") @PathVariable Long id) {
         return apiMapper.toDto(contratService.findById(id));
     }
@@ -56,7 +58,7 @@ public class ContratController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ContratDto create(@Valid @RequestBody ContratDto dto) {
+    public ContratDTO create(@Valid @RequestBody ContratDTO dto) {
         return apiMapper.toDto(contratService.create(apiMapper.toEntity(dto)));
     }
 
@@ -67,9 +69,9 @@ public class ContratController {
             @ApiResponse(responseCode = "400", description = "Données invalides")
 
     @PutMapping("/{id}")
-    public ContratDto update(
+    public ContratDTO update(
             @Parameter(description = "Identifiant du contrat") @PathVariable Long id,
-            @Valid @RequestBody ContratDto dto) {
+            @Valid @RequestBody ContratDTO dto) {
         return apiMapper.toDto(contratService.update(id, apiMapper.toEntity(dto)));
     }
 
@@ -83,6 +85,23 @@ public class ContratController {
     public void deleteById(
             @Parameter(description = "Identifiant du contrat") @PathVariable Long id) {
         contratService.deleteById(id);
+    }
+    @PostMapping("/affecter-reservation")
+    public ContratDTO affecterContratAReservation(
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dateSignature,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dateDebut,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate dateFin) {
+
+        return contratService.affecterContratAReservation(
+                dateSignature, dateDebut, dateFin);
     }
 }
 

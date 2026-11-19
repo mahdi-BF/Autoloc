@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Agence;
-import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.mapper.AgenceMapper;
 import tn.esprit.autoloc.autolocapi.web.dto.AgenceDto;
 import tn.esprit.autoloc.autolocapi.service.IAgenceService;
 
@@ -29,7 +29,7 @@ import tn.esprit.autoloc.autolocapi.service.IAgenceService;
 public class AgenceController {
 
     private final IAgenceService agenceService;
-    private final ApiMapper apiMapper;
+    private final AgenceMapper apiMapper;
 
     @Operation(summary = "Lister les agences")
     @ApiResponse(responseCode = "200", description = "Liste des agences")

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Employe;
-import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.mapper.EmployeMapper;
 import tn.esprit.autoloc.autolocapi.web.dto.EmployeDto;
 import tn.esprit.autoloc.autolocapi.service.IEmployeService;
 
@@ -29,7 +29,7 @@ import tn.esprit.autoloc.autolocapi.service.IEmployeService;
 public class EmployeController {
 
     private final IEmployeService employeService;
-    private final ApiMapper apiMapper;
+    private final EmployeMapper apiMapper;
 
     @Operation(summary = "Lister les employés")
     @ApiResponse(responseCode = "200", description = "Liste des employés")

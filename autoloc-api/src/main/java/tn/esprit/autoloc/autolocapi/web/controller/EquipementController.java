@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Equipement;
-import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.mapper.EquipementMapper;
 import tn.esprit.autoloc.autolocapi.web.dto.EquipementDto;
 import tn.esprit.autoloc.autolocapi.service.IEquipementService;
 
@@ -29,7 +29,7 @@ import tn.esprit.autoloc.autolocapi.service.IEquipementService;
 public class EquipementController {
 
     private final IEquipementService equipementService;
-    private final ApiMapper apiMapper;
+    private final EquipementMapper apiMapper;
 
     @Operation(summary = "Lister les équipements")
     @ApiResponse(responseCode = "200", description = "Liste des équipements")

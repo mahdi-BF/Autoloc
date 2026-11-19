@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.autoloc.autolocapi.domain.Paiement;
-import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
+import tn.esprit.autoloc.autolocapi.mapper.PaiementMapper;
 import tn.esprit.autoloc.autolocapi.web.dto.PaiementDto;
 import tn.esprit.autoloc.autolocapi.service.IPaiementService;
 
@@ -23,7 +23,7 @@ import tn.esprit.autoloc.autolocapi.service.IPaiementService;
 public class PaiementController {
 
     private final IPaiementService paiementService;
-    private final ApiMapper apiMapper;
+    private final PaiementMapper apiMapper;
 
     @Operation(summary = "Lister les paiements")
     @ApiResponse(responseCode = "200", description = "Liste des paiements")

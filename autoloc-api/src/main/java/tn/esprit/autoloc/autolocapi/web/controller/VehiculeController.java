@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import tn.esprit.autoloc.autolocapi.domain.Vehicule;
-import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
-import tn.esprit.autoloc.autolocapi.web.dto.VehiculeDto;
+import tn.esprit.autoloc.autolocapi.mapper.VehiculeMapper;
 import tn.esprit.autoloc.autolocapi.service.IVehiculeService;
+import tn.esprit.autoloc.autolocapi.web.dto.VehiculeDto;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Véhicules", description = "Gestion des véhicules de la flotte")
 @RestController
@@ -29,7 +29,7 @@ import tn.esprit.autoloc.autolocapi.service.IVehiculeService;
 public class VehiculeController {
 
     private final IVehiculeService vehiculeService;
-    private final ApiMapper apiMapper;
+    private final VehiculeMapper apiMapper;
 
     @Operation(summary = "Lister les véhicules")
     @ApiResponse(responseCode = "200", description = "Liste des véhicules")
@@ -83,5 +83,21 @@ public class VehiculeController {
     public void deleteById(
             @Parameter(description = "Identifiant du véhicule") @PathVariable Long id) {
         vehiculeService.deleteById(id);
+    }
+    @PostMapping("/{idVehicule}/affecter-equipement/{idEquipement}")
+    public VehiculeDto affecterVehiculeAEquipement(
+            @PathVariable Long idVehicule,
+            @PathVariable Long idEquipement) {
+
+        return vehiculeService.affecterVehiculeAEquipement(
+                idVehicule, idEquipement);
+    }
+    @PostMapping("/affecter-maintenance")
+    public VehiculeDto affecterMaintenanceAvehicule(
+            @RequestParam String description,
+            @RequestParam String immatriculation) {
+
+        return vehiculeService.affecterMaintenanceAvehicule(
+                description, immatriculation);
     }
 }

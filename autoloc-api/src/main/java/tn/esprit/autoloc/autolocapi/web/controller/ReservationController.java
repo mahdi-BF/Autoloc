@@ -8,19 +8,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.autolocapi.domain.Reservation;
-import tn.esprit.autoloc.autolocapi.mapper.ApiMapper;
-import tn.esprit.autoloc.autolocapi.web.dto.ReservationDto;
+import tn.esprit.autoloc.autolocapi.mapper.ReservationMapper;
+import tn.esprit.autoloc.autolocapi.web.dto.ReservationRequestDTO;
 import tn.esprit.autoloc.autolocapi.service.IReservationService;
+import tn.esprit.autoloc.autolocapi.web.dto.ReservationResponseDTO;
+import tn.esprit.autoloc.autolocapi.web.dto.ReservationWithContratRequestDTO;
 
 @Tag(name = "Réservations", description = "Gestion des réservations de véhicules")
 @RestController
@@ -29,14 +23,15 @@ import tn.esprit.autoloc.autolocapi.service.IReservationService;
 public class ReservationController {
 
     private final IReservationService reservationService;
-    private final ApiMapper apiMapper;
+    private final ReservationMapper reservationMapper;
 
     @Operation(summary = "Lister les réservations")
     @ApiResponse(responseCode = "200", description = "Liste des réservations")
 
+
     @GetMapping
-    public List<ReservationDto> findAll() {
-        return reservationService.findAll().stream().map(apiMapper::toDto).toList();
+    public List<ReservationResponseDTO> findAll() {
+        return reservationService.findAll().stream().map(reservationMapper::toResponse).toList();
     }
 
     @Operation(summary = "Consulter une réservation")
@@ -45,9 +40,9 @@ public class ReservationController {
             @ApiResponse(responseCode = "404", description = "Réservation introuvable")
     })
     @GetMapping("/{id}")
-    public ReservationDto findById(
+    public ReservationResponseDTO findById(
             @Parameter(description = "Identifiant de la réservation") @PathVariable Long id) {
-        return apiMapper.toDto(reservationService.findById(id));
+        return reservationMapper.toResponse(reservationService.findById(id));
     }
 
     @Operation(summary = "Créer une réservation")
@@ -57,8 +52,8 @@ public class ReservationController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ReservationDto create(@jakarta.validation.Valid @RequestBody ReservationDto dto) {
-        return apiMapper.toDto(reservationService.create(apiMapper.toEntity(dto)));
+    public ReservationResponseDTO create(@jakarta.validation.Valid @RequestBody ReservationRequestDTO dto) {
+        return reservationMapper.toResponse(reservationService.create(reservationMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Modifier une réservation")
@@ -69,10 +64,10 @@ public class ReservationController {
 
     })
     @PutMapping("/{id}")
-    public ReservationDto update(
+    public ReservationResponseDTO update(
             @Parameter(description = "Identifiant de la réservation") @PathVariable Long id,
-            @jakarta.validation.Valid @RequestBody ReservationDto dto) {
-        return apiMapper.toDto(reservationService.update(id, apiMapper.toEntity(dto)));
+            @jakarta.validation.Valid @RequestBody ReservationRequestDTO dto) {
+        return reservationMapper.toResponse(reservationService.update(id, reservationMapper.toEntity(dto)));
     }
 
     @Operation(summary = "Supprimer une réservation")
@@ -85,5 +80,21 @@ public class ReservationController {
     public void deleteById(
             @Parameter(description = "Identifiant de la réservation") @PathVariable Long id) {
         reservationService.deleteById(id);
+    }
+    @PostMapping("/{idReservation}/affecter-client")
+    public ReservationResponseDTO affecterReservationAClient(
+            @PathVariable Long idReservation,
+            @RequestParam String nom,
+            @RequestParam String prenom) {
+
+        return reservationService.affecterReservationAClient(
+                idReservation, nom, prenom);
+    }
+    @PostMapping("/avec-contrat")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ReservationResponseDTO creerReservationEtContratAssocie(
+            @jakarta.validation.Valid @RequestBody ReservationWithContratRequestDTO requestDTO) {
+
+        return reservationService.creerReservationEtContratAssocie(requestDTO);
     }
 }
